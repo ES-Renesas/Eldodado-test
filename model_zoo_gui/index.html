@@ -303,19 +303,11 @@
       <!-- Nav Tabs -->
       <nav class="flex items-center gap-8 h-full">
         <button id="tab-catalog" class="tab-btn active text-sm font-medium text-slate-500 h-full flex items-center px-1"
-          onclick="switchTab('catalog')">
+          >
           <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
           </svg>
           Model Catalog
-        </button>
-        <button id="tab-preflight" class="tab-btn text-sm font-medium text-slate-500 h-full flex items-center px-1"
-          onclick="switchTab('preflight')">
-          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
-          Pre-Flight Check
         </button>
       </nav>
 
@@ -499,50 +491,7 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       VIEW 2: PRE-FLIGHT CHECK
-       ═══════════════════════════════════════════════════════════════ -->
-  <div id="view-preflight" class="max-w-[1600px] mx-auto p-6 fade-in" style="display:none;">
-
-    <div class="grid lg:grid-cols-2 gap-6">
-
-      <!-- Drag & Drop + Netron Visualizer -->
-      <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
-        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-          </svg>
-          Model Inspector
-        </h2>
-
-        <!-- Drop Zone -->
-        <div id="drop-zone" class="drop-zone rounded-xl p-10 text-center cursor-pointer mb-4"
-          onclick="document.getElementById('file-input').click()">
-          <input type="file" id="file-input" accept=".tflite" class="hidden" onchange="handleFileSelect(event)" />
-          <div class="mb-3">
-            <svg class="w-12 h-12 mx-auto text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-            </svg>
-          </div>
-          <p class="text-sm font-medium text-slate-500">Drop your <span
-              class="text-blue-600 font-semibold">.tflite</span> model here to inspect</p>
-          <p class="text-xs text-slate-400 mt-1">or click to browse</p>
-        </div>
-
-        <!-- File info (shown after upload) -->
-        <div id="file-info" class="hidden mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-          <div class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span id="file-name" class="text-sm font-semibold text-emerald-800"></span>
-            <span id="file-size" class="text-xs text-emerald-600 ml-auto"></span>
-          </div>
-        </div>
+  
 
         <!-- Model Details (shown after upload) -->
         <div id="model-details" class="hidden fade-in">
@@ -716,8 +665,7 @@
           document.getElementById('stat-total').textContent = 'ERR';
           console.error('Failed to load models.json');
         });
-      setupDragDrop();
-    });
+          });
 
     function bootUI() {
       // Populate all dropdown filters from the data
@@ -744,22 +692,7 @@
       if (vals.includes(cur)) sel.value = cur;
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // TAB SWITCHING (Catalog ↔ Pre-Flight)
-    // ─────────────────────────────────────────────────────────────
-    function switchTab(tab) {
-      const catalog = document.getElementById('view-catalog');
-      const preflight = document.getElementById('view-preflight');
-      const tabCat = document.getElementById('tab-catalog');
-      const tabPre = document.getElementById('tab-preflight');
-      if (tab === 'catalog') {
-        catalog.style.display = ''; preflight.style.display = 'none';
-        tabCat.classList.add('active'); tabPre.classList.remove('active');
-      } else {
-        catalog.style.display = 'none'; preflight.style.display = '';
-        tabPre.classList.add('active'); tabCat.classList.remove('active');
-      }
-    }
+    
 
     // ─────────────────────────────────────────────────────────────
     // VIEW TOGGLE (Graph ↔ Table)
@@ -1095,149 +1028,7 @@
       renderTable();
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // DRAG-AND-DROP for .tflite files
-    // ─────────────────────────────────────────────────────────────
-    function setupDragDrop() {
-      const dropZone = document.getElementById('drop-zone');
-
-      ['dragenter', 'dragover'].forEach(evt => {
-        dropZone.addEventListener(evt, e => {
-          e.preventDefault();
-          dropZone.classList.add('drag-over');
-        });
-      });
-
-      ['dragleave', 'drop'].forEach(evt => {
-        dropZone.addEventListener(evt, e => {
-          e.preventDefault();
-          dropZone.classList.remove('drag-over');
-        });
-      });
-
-      dropZone.addEventListener('drop', e => {
-        const files = e.dataTransfer.files;
-        if (files.length > 0) handleFile(files[0]);
-      });
-    }
-
-    function handleFileSelect(event) {
-      const file = event.target.files[0];
-      if (file) handleFile(file);
-    }
-
-    function handleFile(file) {
-      // Show file info banner
-      document.getElementById('file-info').classList.remove('hidden');
-      document.getElementById('file-name').textContent = file.name;
-      document.getElementById('file-size').textContent = (file.size / 1024).toFixed(1) + ' KB';
-
-      // Populate metadata table
-      document.getElementById('meta-filename').textContent = file.name;
-      const sizeKB = (file.size / 1024).toFixed(1);
-      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-      document.getElementById('meta-filesize').textContent = file.size > 1024 * 1024
-        ? `${sizeMB} MB (${file.size.toLocaleString()} bytes)`
-        : `${sizeKB} KB (${file.size.toLocaleString()} bytes)`;
-
-      // Detect format from extension
-      const ext = file.name.split('.').pop().toLowerCase();
-      const formatMap = { tflite: 'TensorFlow Lite (FlatBuffer)', onnx: 'ONNX', pb: 'TensorFlow SavedModel' };
-      document.getElementById('meta-format').textContent = formatMap[ext] || ext.toUpperCase();
-
-      // Show model details section, hide placeholder
-      document.getElementById('model-details').classList.remove('hidden');
-      document.getElementById('netron-placeholder').classList.add('hidden');
-    }
-
-    // ─────────────────────────────────────────────────────────────
-    // C-HEADER GENERATOR
-    // ─────────────────────────────────────────────────────────────
-    function generateCHeader() {
-      const headerCode = `/**
- * @file    model_metadata.h
- * @brief   Auto-generated model configuration for MCU deployment
- * @author  Model Zoo Explorer
- * @date    ${new Date().toISOString().split('T')[0]}
- *
- * WARNING: This is a template. Replace placeholder values
- *          with your actual model parameters before compiling.
- */
-
-#ifndef MODEL_METADATA_H
-#define MODEL_METADATA_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* ════════════════════════════════════════════════════════════════
- *  Memory Configuration
- * ════════════════════════════════════════════════════════════════ */
-
-/**
- * Size of the TensorFlow Lite Micro tensor arena in bytes.
- * This must be tuned per-model. Start large and reduce until
- * the interpreter returns kTfLiteOk.
- */
-#define TENSOR_ARENA_SIZE_BYTES      (128 * 1024)  /* 128 KB — adjust per model */
-
-/* ════════════════════════════════════════════════════════════════
- *  Input Tensor Parameters
- * ════════════════════════════════════════════════════════════════ */
-
-#define MODEL_INPUT_WIDTH            224
-#define MODEL_INPUT_HEIGHT           224
-#define MODEL_INPUT_CHANNELS         3
-
-/* ════════════════════════════════════════════════════════════════
- *  Int8 Quantization Pre-processing
- * ════════════════════════════════════════════════════════════════ */
-
-/**
- * Zero-point and scale for converting float [0.0, 1.0] input
- * to int8 [-128, 127] range. Obtain these from the .tflite
- * model's input tensor quantization parameters.
- */
-#define PREPROCESS_ZERO_POINT        (-128)
-#define PREPROCESS_SCALE_FACTOR      (0.003921568f)  /* 1/255 */
-
-/* ════════════════════════════════════════════════════════════════
- *  Target Hardware
- * ════════════════════════════════════════════════════════════════ */
-
-#define TARGET_MCU                   "Renesas RA8"   /* or "STM32" */
-#define TARGET_CLOCK_MHZ             480
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* MODEL_METADATA_H */`;
-
-      const output = document.getElementById('cheader-output');
-      const code = document.getElementById('cheader-code');
-      code.textContent = headerCode;
-      output.classList.remove('hidden');
-      output.classList.remove('fade-in');
-      void output.offsetWidth;
-      output.classList.add('fade-in');
-    }
-
-    function copyCHeader() {
-      const code = document.getElementById('cheader-code').textContent;
-      navigator.clipboard.writeText(code).then(() => {
-        const btn = event.target.closest('button');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = `<svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg> Copied!`;
-        btn.classList.add('text-emerald-600');
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.classList.remove('text-emerald-600');
-        }, 2000);
-      });
-    }
-  </script>
+    </script>
 
 </body>
 
