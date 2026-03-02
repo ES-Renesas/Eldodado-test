@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Model Zoo Explorer</title>
   <meta name="description"
-    content="Interactive explorer for quantized AI models optimized for Renesas RA8 and STM32 microcontrollers. Filter by hardware constraints and visualize accuracy vs latency trade-offs." />
+    content="Interactive explorer for quantized AI models optimized for Renesas RA8P1. Filter by hardware constraints and visualize accuracy vs latency trade-offs." />
 
   <!-- ═══════════════════════════════════════════════════════════════
        CDN Dependencies — Zero-build architecture
@@ -302,8 +302,8 @@
 
       <!-- Nav Tabs -->
       <nav class="flex items-center gap-8 h-full">
-        <button id="tab-catalog" class="tab-btn active text-sm font-medium text-slate-500 h-full flex items-center px-1"
-          >
+        <button id="tab-catalog"
+          class="tab-btn active text-sm font-medium text-slate-500 h-full flex items-center px-1">
           <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
           </svg>
@@ -454,14 +454,16 @@
             </div>
             <div class="flex items-center gap-2">
               <label class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Y-Axis</label>
-              <span
-                class="text-xs font-medium text-slate-600 px-2 py-1 bg-slate-50 rounded-lg border border-slate-200">Accuracy
-                (%)</span>
+              <select id="chart-y-axis" onchange="renderChart()"
+                class="border border-slate-200 rounded-lg px-2 py-1 text-xs bg-white focus:ring-2 focus:ring-blue-500 outline-none">
+                <option value="accuracy" selected>Accuracy (%)</option>
+                <option value="macs">MACs (M)</option>
+              </select>
             </div>
             <div class="flex items-center gap-4 ml-auto">
               <label class="flex items-center gap-1.5 cursor-pointer">
                 <input type="checkbox" id="chart-pareto" onchange="renderChart()"
-                  class="w-3.5 h-3.5 rounded border-slate-300 text-blue-600" />
+                  class="w-3.5 h-3.5 rounded border-slate-300 text-blue-600" disabled />
                 <span class="text-[10px] text-slate-500">Pareto Frontier</span>
               </label>
               <label class="flex items-center gap-1.5 cursor-pointer">
@@ -472,6 +474,20 @@
             </div>
           </div>
           <div id="plotly-chart" style="width:100%; height:450px;"></div>
+          <!-- Pareto Helper Note -->
+          <div class="mt-5 pt-3 border-t border-slate-100 flex items-start gap-2 justify-center text-slate-400">
+            <svg class="w-4 h-4 text-sky-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-[11px] leading-relaxed">
+              <span class="font-semibold text-slate-500">Pareto Frontier:</span>
+              Select a specific <strong class="text-slate-600">Task</strong> and <strong
+                class="text-slate-600">Dataset</strong> from the sidebar to enable this feature. It visualizes the
+              optimal tradeoff between your chosen X and Y axes.
+            </p>
+          </div>
         </div>
 
         <!-- Table Container -->
@@ -491,127 +507,11 @@
     </div>
   </div>
 
+
+
   
-
-        <!-- Model Details (shown after upload) -->
-        <div id="model-details" class="hidden fade-in">
-          <!-- Open in Netron button -->
-          <a id="netron-link" href="https://netron.app" target="_blank" rel="noopener noreferrer"
-            class="inline-flex items-center gap-2 w-full justify-center bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-semibold px-5 py-3 rounded-lg shadow-md hover:shadow-lg hover:from-indigo-600 hover:to-purple-700 transition-all active:scale-[0.97] mb-4">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-            </svg>
-            Open in Netron → Visualize Full Model Graph
-          </a>
-          <p class="text-xs text-slate-400 text-center mb-4">Opens netron.app in a new tab — drag your same file there
-            to see the full graph</p>
-
-          <!-- File Metadata Table -->
-          <div class="rounded-lg border border-slate-200 overflow-hidden">
-            <table class="w-full text-sm">
-              <tbody>
-                <tr class="border-b border-slate-100">
-                  <td class="px-4 py-2.5 bg-slate-50 font-semibold text-slate-600 w-36">File Name</td>
-                  <td id="meta-filename" class="px-4 py-2.5 text-slate-800 font-mono text-xs">—</td>
-                </tr>
-                <tr class="border-b border-slate-100">
-                  <td class="px-4 py-2.5 bg-slate-50 font-semibold text-slate-600">File Size</td>
-                  <td id="meta-filesize" class="px-4 py-2.5 text-slate-800 font-mono text-xs">—</td>
-                </tr>
-                <tr class="border-b border-slate-100">
-                  <td class="px-4 py-2.5 bg-slate-50 font-semibold text-slate-600">Format</td>
-                  <td id="meta-format" class="px-4 py-2.5 text-slate-800 font-mono text-xs">—</td>
-                </tr>
-                <tr>
-                  <td class="px-4 py-2.5 bg-slate-50 font-semibold text-slate-600">Status</td>
-                  <td class="px-4 py-2.5">
-                    <span class="chip bg-emerald-50 text-emerald-700">✓ Ready for inspection</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Placeholder when no model loaded -->
-        <div id="netron-placeholder"
-          class="rounded-lg border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center"
-          style="height: 300px;">
-          <div class="text-center">
-            <svg class="w-10 h-10 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" stroke-width="1.5"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <p class="text-sm font-medium text-slate-400">No model loaded</p>
-            <p class="text-xs text-slate-300 mt-1">Drop a .tflite file above to get started</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- C-Header Generator -->
-      <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
-        <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-          <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
-          </svg>
-          C-Header Generator
-        </h2>
-
-        <p class="text-sm text-slate-500 mb-4">
-          Generate a template <code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded font-mono">model_metadata.h</code>
-          header file
-          with pre-filled configuration macros for your MCU deployment pipeline.
-        </p>
-
-        <button id="btn-generate-header" onclick="generateCHeader()"
-          class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all active:scale-[0.97]">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          Generate C-Header
-        </button>
-
-        <!-- Generated code block -->
-        <div id="cheader-output" class="hidden mt-5 fade-in">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">model_metadata.h</span>
-            <button onclick="copyCHeader()"
-              class="text-xs text-blue-500 hover:text-blue-700 font-medium transition-colors flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
-              </svg>
-              Copy
-            </button>
-          </div>
-          <pre
-            class="bg-slate-900 text-slate-100 rounded-lg p-4 overflow-x-auto text-xs leading-relaxed font-mono"><code id="cheader-code"></code></pre>
-        </div>
-
-        <!-- Deployment Info -->
-        <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <div class="flex items-start gap-2">
-            <svg class="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-            </svg>
-            <div>
-              <p class="text-xs font-semibold text-amber-800 mb-1">Supported Targets</p>
-              <div class="flex flex-wrap gap-2">
-                <span class="chip bg-amber-100 text-amber-800">Renesas RA8</span>
-                <span class="chip bg-amber-100 text-amber-800">STM32</span>
-                <span class="chip bg-slate-100 text-slate-600">Generic Cortex-M</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  </div>
+  </div>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════
@@ -665,7 +565,7 @@
           document.getElementById('stat-total').textContent = 'ERR';
           console.error('Failed to load models.json');
         });
-          });
+    });
 
     function bootUI() {
       // Populate all dropdown filters from the data
@@ -692,7 +592,7 @@
       if (vals.includes(cur)) sel.value = cur;
     }
 
-    
+
 
     // ─────────────────────────────────────────────────────────────
     // VIEW TOGGLE (Graph ↔ Table)
@@ -771,7 +671,7 @@
       const paretoCheckbox = document.getElementById('chart-pareto');
       const paretoEnabled = task !== 'All' && dataset !== 'All';
       paretoCheckbox.disabled = !paretoEnabled;
-      paretoCheckbox.parentElement.style.opacity = paretoEnabled ? '1' : '0.35';
+      paretoCheckbox.parentElement.style.opacity = paretoEnabled ? '1' : '0.5';
       paretoCheckbox.parentElement.style.cursor = paretoEnabled ? 'pointer' : 'not-allowed';
       if (!paretoEnabled) paretoCheckbox.checked = false;
 
@@ -853,22 +753,23 @@
       const valid = data.filter(m => m[xField] != null && m[yField] != null);
       if (valid.length < 2) return null;
 
-      // Determine X-axis direction: all metrics are now lower-is-better (latency, MACs, Flash, RAM)
-      const xLowerIsBetter = true;
-      const xAscending = true;
+      // Accuracy AND MACs (throughput) are both "higher is better"
+      const yHigherIsBetter = yField === 'accuracy' || yField === 'macs';
 
-      // Sort by X in the "worse → better" direction
-      const sorted = [...valid].sort((a, b) =>
-        xAscending ? a[xField] - b[xField] : b[xField] - a[xField]
-      );
+      // Strict mathematical Pareto check:
+      // Sort by X ascending (lower latency = better). If X is tied, sort by best Y first.
+      const sorted = [...valid].sort((a, b) => {
+        if (a[xField] !== b[xField]) return a[xField] - b[xField];
+        return yHigherIsBetter ? b[yField] - a[yField] : a[yField] - b[yField];
+      });
 
-      // Sweep: Y is always accuracy (higher = better)
-      // Keep models where accuracy is non-decreasing as X gets "worse"
       const pareto = [];
-      let bestY = -Infinity;
+      let bestY = yHigherIsBetter ? -Infinity : Infinity;
 
       for (const m of sorted) {
-        if (m[yField] >= bestY) {
+        // Keep point only if Y is strictly better than the best Y seen so far
+        const isBetter = yHigherIsBetter ? m[yField] > bestY : m[yField] < bestY;
+        if (isBetter) {
           bestY = m[yField];
           pareto.push(m);
         }
@@ -904,11 +805,10 @@
     function renderChart() {
       const archs = [...new Set(filteredData.map(m => m.architecture))];
 
-      // Y-axis locked to accuracy
       const xField = document.getElementById('chart-x-axis').value;
-      const yField = 'accuracy';
+      const yField = document.getElementById('chart-y-axis').value;
       const xTitle = AXIS_LABELS[xField] || xField;
-      const yTitle = 'Accuracy (%)';
+      const yTitle = AXIS_LABELS[yField] || yField;
       const useLog = document.getElementById('chart-log-x').checked;
 
       const traces = archs.map(arch => {
@@ -1028,7 +928,7 @@
       renderTable();
     }
 
-    </script>
+  </script>
 
 </body>
 
